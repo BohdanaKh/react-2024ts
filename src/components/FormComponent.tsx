@@ -5,9 +5,11 @@ import { ImSad } from "react-icons/im";
 
 import {AuthDataModel} from "../models/AuthDataModel";
 import {authService} from "../services/api.service";
-
+import useAuth from "../hooks/useAuth.hook";
 
 const FormComponent: FC = () => {
+    const { signIn } = useAuth();
+
    const { handleSubmit, register}  = useForm<AuthDataModel>({defaultValues: {username: 'userBK5121243', password: 'P5a1$$2w'}});
 
     const [isAuthState, setIsAuthState] = useState<boolean>(false);
@@ -15,6 +17,7 @@ const FormComponent: FC = () => {
     const authenticate = async ( formData: AuthDataModel): Promise<void> =>  {
         const isAuth = await authService.authentication(formData);
         setIsAuthState(isAuth);
+        signIn();
     };
 
 

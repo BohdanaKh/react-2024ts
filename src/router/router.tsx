@@ -12,7 +12,7 @@ export const routerConfig = createBrowserRouter([
         errorElement: <NotFoundPage/>,
         children: [
             { index: true, element: <AuthPage/>},
-            { path: 'cars', element: <CarsPage/>},
+            { path: 'cars', element: <CarsPage/> },
         ]
 
     }
