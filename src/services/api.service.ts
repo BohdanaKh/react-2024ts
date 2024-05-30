@@ -1,4 +1,5 @@
 import axios, {AxiosError} from "axios";
+
 import {ITokenObtainPair} from "../models/ITokenObtainPair";
 import {retrieveLocalStorageData} from "./helpers/helpers";
 import {AuthDataModel} from "../models/AuthDataModel";

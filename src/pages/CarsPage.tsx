@@ -3,7 +3,6 @@ import {FC, useEffect, useState} from 'react';
 import {CarsComponent} from "../components/CarsComponent";
 import {carService} from "../services/api.service";
 import {ICarPaginatedModel} from "../models/ICarPaginatedModel";
-import {ICarWithAuthModel} from "../models/ICarWithAuthModel";
 
 
 const CarsPage: FC = () => {
