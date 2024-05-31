@@ -5,6 +5,7 @@ import {retrieveLocalStorageData} from "./helpers/helpers";
 import {AuthDataModel} from "../models/AuthDataModel";
 import {ICarPaginatedModel} from "../models/ICarPaginatedModel";
 
+
 const axiosInstance = axios.create({
     baseURL: 'http://owu.linkpc.net/carsAPI/v2',
     headers: {}
@@ -36,16 +37,16 @@ const authService = {
 }
 
 const carService = {
-    getCars: async (): Promise<ICarPaginatedModel | undefined> => {
+    getCars: async (page: string): Promise<ICarPaginatedModel | undefined> => {
         try {
-            const response = await axiosInstance.get<ICarPaginatedModel>('/cars');
+            const response = await axiosInstance.get<ICarPaginatedModel>('/cars', {params: {page: page} });
             return response?.data as ICarPaginatedModel;
         } catch (e) {
             const axiosError = e as AxiosError;
             if (axiosError?.response?.status === 401) {
                 const refreshToken = retrieveLocalStorageData<ITokenObtainPair>('tokenPair').refresh;
                 await authService.refresh(refreshToken);
-                await carService.getCars();
+                await carService.getCars( page);
             }
         }
     }
