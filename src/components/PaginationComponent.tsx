@@ -10,7 +10,6 @@ interface IProps {
 
 const PaginationComponent: FC<IProps> = ({ prev, next }) => {
     const [, setQuery] = useSearchParams({page: '1'});
-    console.log('prev:', {...prev}, 'next:', {...next});
     const changePage = (action: string) => {
             switch (action) {
                 case 'prev':
@@ -24,18 +23,12 @@ const PaginationComponent: FC<IProps> = ({ prev, next }) => {
 
     return (
         <div>
-            <button onClick={() => {
-                changePage('prev');
-            }}
-                    disabled={!prev}
-            >prev
+            <button onClick={() => { changePage('prev')}} disabled={!prev}>
+                prev
             </button>
 
-            <button onClick={() => {
-                changePage('next');
-            }}
-                    disabled={!next}
-            >next
+            <button onClick={() => { changePage('next') }} disabled={!next}>
+                next
             </button>
         </div>
     );
