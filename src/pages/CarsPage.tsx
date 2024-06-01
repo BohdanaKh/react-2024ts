@@ -1,19 +1,21 @@
 import {FC, useEffect, useState} from 'react';
-import {useSearchParams} from "react-router-dom";
+import {useNavigate, useSearchParams} from "react-router-dom";
 
 import {CarsComponent} from "../components/CarsComponent";
-import {carService} from "../services/api.service";
 import {ICarPaginatedModel} from "../models/ICarPaginatedModel";
 import useAuth from "../hooks/useAuth.hook";
 import {PaginationComponent} from "../components/PaginationComponent";
+import {fetchAndSetCarsState, refresh} from "../services/helpers/cars.helpers";
+
 
 
 const CarsPage: FC = () => {
 
-    const [query, setQuery] = useSearchParams({page: '1'});
+    const [query] = useSearchParams();
+    const navigate = useNavigate();
+    const { isUserAuth, signIn, signOut } = useAuth();
 
-    const { isUserAuth } = useAuth();
-    const [carsObjectWithPagination, setCarsObjectWithPagination] = useState<ICarPaginatedModel | undefined> ({
+    const [carsObjectWithPagination, setCarsObjectWithPagination] = useState<ICarPaginatedModel> ({
         total_items: 0,
         total_pages: 0,
         prev: null,
@@ -21,32 +23,50 @@ const CarsPage: FC = () => {
         items: [],
     });
 
-    useEffect(() => {
-        setQuery({page: '1'})
-    }, []);
-
-    useEffect(() => {
-        if (isUserAuth) {
-            carService.getCars(query.get('page') || '1').then(value => {
-                if (value) {
-                    setCarsObjectWithPagination(value)
-                }
-            });
-        }
-    }, [isUserAuth, query]);
-
-    // const changePage = (action: string) => {
-    //     switch (action) {
-    //         case 'prev':
-    //             setQuery({...carsObjectWithPagination.prev});
-    //             break;
-    //         case 'next':
-    //             setQuery({...carsObjectWithPagination.next});
-    //             break;
+    // useEffect(() => {
+    //         const getCarsData = async () => {
+    //             try {
+    //                 const response = await carService.getCars(query.get('page') || '1');
+    //             if (response) {
+    //                 setCarsObjectWithPagination(response);
+    //             }
+    //             } catch (e) {
+    //                const axiosError = e as AxiosError;
+    //                if (axiosError && axiosError?.response?.status === 401) {
+    //                    try {
+    //                        await authService.refresh();
+    //                    } catch (e) {
+    //                        return navigate('/');
+    //                    }
+    //                    const response = await carService.getCars(query.get('page') || '1');
+    //                    if (response) {
+    //                        setCarsObjectWithPagination(response);
+    //                    }
+    //                }
+    //             }
+    //         }
+    //         getCarsData();
     //
-    //     }
-    // }
+    // }, [query]);
 
+    useEffect( () => {
+        const getCarsData = async () => {
+        if (isUserAuth) {
+            try {
+                await fetchAndSetCarsState({query, setCarsObjectWithPagination})
+            } catch (e) {
+             await refresh({query, setCarsObjectWithPagination, signIn, signOut, navigate})
+
+            }
+        } else {
+            await refresh({query, setCarsObjectWithPagination, signIn, signOut, navigate})
+        }
+
+    }
+    getCarsData();
+
+
+    }, [isUserAuth, query])
 
     return (
         <div>
@@ -54,6 +74,7 @@ const CarsPage: FC = () => {
             <PaginationComponent prev={carsObjectWithPagination.prev} next={carsObjectWithPagination.next} />
         </div>
     );
-};
+
+}
 
 export {CarsPage};

@@ -1,4 +1,4 @@
-import axios, {AxiosError} from "axios";
+import axios from "axios";
 
 import {ITokenObtainPair} from "../models/ITokenObtainPair";
 import {retrieveLocalStorageData} from "./helpers/helpers";
@@ -21,34 +21,22 @@ axiosInstance.interceptors.request.use(request => {
 
 const authService = {
     authentication: async (authData: AuthDataModel): Promise<boolean> => {
-        let response;
-        try {
-            response = await axiosInstance.post<ITokenObtainPair>('/auth', authData);
-            localStorage.setItem('tokenPair', JSON.stringify(response.data));
-        } catch (e) {
-            console.log(e);
-        }
+       const response = await axiosInstance.post<ITokenObtainPair>('/auth', authData);
+        localStorage.setItem('tokenPair', JSON.stringify(response.data));
         return !!(response?.data?.access && response?.data?.refresh);
     },
-    refresh: async (refreshToken: string): Promise<void> => {
+
+    refresh: async (): Promise<void> => {
+        const refreshToken = retrieveLocalStorageData<ITokenObtainPair>('tokenPair').refresh;
         const response = await axiosInstance.post<ITokenObtainPair>('/auth/refresh', {refresh: refreshToken});
         localStorage.setItem('tokenPair', JSON.stringify(response.data));
     }
 }
 
 const carService = {
-    getCars: async (page: string): Promise<ICarPaginatedModel | undefined> => {
-        try {
+    getCars: async (page: string = '1'): Promise<ICarPaginatedModel | null> => {
             const response = await axiosInstance.get<ICarPaginatedModel>('/cars', {params: {page: page} });
-            return response?.data as ICarPaginatedModel;
-        } catch (e) {
-            const axiosError = e as AxiosError;
-            if (axiosError?.response?.status === 401) {
-                const refreshToken = retrieveLocalStorageData<ITokenObtainPair>('tokenPair').refresh;
-                await authService.refresh(refreshToken);
-                await carService.getCars( page);
-            }
-        }
+            return response.data;
     }
 }
 

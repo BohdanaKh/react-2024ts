@@ -1,11 +1,17 @@
 import React, {createContext, ReactNode, useState} from 'react';
 
 type UserAuth = {
-isUserAuth: boolean,
-signIn: () => void,
-signOut: () => void
+    isUserAuth: boolean,
+    signIn: () => void,
+    signOut: () => void
 }
-const AuthContext = createContext<UserAuth | null>(null);
+
+const defaultUserAuth: UserAuth = {
+isUserAuth: false,
+signIn: () => {},
+signOut: () => {}
+}
+const AuthContext = createContext<UserAuth>(defaultUserAuth);
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [isUserAuth, setIsUserAuth] = useState(false);

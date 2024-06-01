@@ -1,9 +1,9 @@
 import {FC} from 'react';
-import {IPaginatedPageModel} from "../models/IPaginatedPageModel";
 import {useSearchParams} from "react-router-dom";
 
+import {IPaginatedPageModel} from "../models/IPaginatedPageModel";
+
 interface IProps {
-    // changePage: (action: string) => void;
     next: IPaginatedPageModel | null;
     prev: IPaginatedPageModel | null;
 }
